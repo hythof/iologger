@@ -29,7 +29,8 @@ class RedisFilter(FilterBase):
 
     def write(self, node, puts):
         v = node.frame2.f_locals
-        puts('[redis] {} # {}'.format(' '.join(v['args']), self.show(node.ret)))
+        args = [str(x) for x in v['args']]
+        puts('[redis] {} # {}'.format(' '.join(args), self.show(node.ret)))
 
 
 class MysqlFilter(FilterBase):
