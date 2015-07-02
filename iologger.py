@@ -6,9 +6,9 @@ import datetime
 
 class Trace(object):
     def __init__(self, filters):
-        self.stack = []
         self.filters = filters
         self.nodes = []
+        self.stack = []
 
     def write(self, out):
         def puts(x):
@@ -18,7 +18,10 @@ class Trace(object):
         for node in self.nodes:
             if node.is_valid:
                 node.write(puts)
+
+    def clear(self):
         del self.nodes[:]
+        del self.stack[:]
 
     def run(self, frame, event, arg):
         if event == 'c_call' or event == 'c_return':

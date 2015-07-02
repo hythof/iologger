@@ -37,5 +37,6 @@ class IOLoggerMiddleware(object):
             response.status_code
         ))
         self.trace.write(self.output)
+        self.trace.clear()
         sys.setprofile(None)
         return response
