@@ -1,4 +1,4 @@
-## What IS It?
+## What is it?
 Keep a IO log for Django.
 
 Support IO
