@@ -2,6 +2,8 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 import sys
+import os
+import re
 from django.conf import settings
 from .iologger import Trace
 from .filters import RedisFilter, MysqlFilter
@@ -26,6 +28,9 @@ class IOLoggerMiddleware(object):
 
         self.trace = Trace(filters)
         self.output = conf['output']
+        rule = os.environ.get('show_stack', False)
+        if rule:
+            self.show_stack = re.compile(rule)
 
     def process_request(self, request):
         sys.setprofile(self.trace.run)
@@ -36,7 +41,7 @@ class IOLoggerMiddleware(object):
             request.path,
             response.status_code
         ))
-        self.trace.write(self.output)
+        self.trace.write(self.output, self.show_stack)
         self.trace.clear()
         sys.setprofile(None)
         return response
