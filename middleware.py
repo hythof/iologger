@@ -31,6 +31,8 @@ class IOLoggerMiddleware(object):
         rule = os.environ.get('show_stack', False)
         if rule:
             self.show_stack = re.compile(rule)
+        else:
+            self.show_stack = None
 
     def process_request(self, request):
         sys.setprofile(self.trace.run)
