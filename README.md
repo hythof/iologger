@@ -1,5 +1,6 @@
 ## What is it?
-Keep a IO log for Django.
+Show IO log for Django.
+It information helpful for development.
 
 Support IO
 - redis
