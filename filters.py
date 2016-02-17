@@ -4,6 +4,13 @@ from __future__ import unicode_literals
 import re
 
 
+def safe(x):
+    if isinstance(x, basestring):
+        return x.decode('utf-8', errors='replace')
+    else:
+        return unicode(x)
+
+
 class FilterBase(object):
     func = ''
     path = ''
@@ -29,8 +36,9 @@ class RedisFilter(FilterBase):
 
     def write(self, node, puts):
         v = node.frame2.f_locals
-        args = [str(x) for x in v['args']]
-        puts('[redis] {} # {}'.format(' '.join(args), self.show(node.ret)))
+        args = ' '.join([safe(x) for x in v['args']])
+        ret = self.show(node.ret)
+        puts('[redis] {} # {}'.format(args, ret))
 
 
 class MysqlFilter(FilterBase):
