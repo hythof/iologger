@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from __future__ import print_function
 from __future__ import unicode_literals
 import sys
@@ -10,9 +9,14 @@ from .filters import RedisFilter, MysqlFilter
 
 
 _default_conf = {
+    'response': True,
     'filter': ['redis', 'mysql'],
     'output': sys.stdout.write,
 }
+
+
+def noop(*args, **kwargs):
+    pass
 
 
 class IOLoggerMiddleware(object):
@@ -28,6 +32,7 @@ class IOLoggerMiddleware(object):
 
         self.trace = Trace(filters)
         self.output = conf['output']
+        self.on_response = self.show_response if conf['response'] else noop
         rule = os.environ.get('show_stack', False)
         if rule:
             self.show_stack = re.compile(rule)
@@ -38,12 +43,19 @@ class IOLoggerMiddleware(object):
         sys.setprofile(self.trace.run)
 
     def process_response(self, request, response):
-        self.output("-- {} {} {}\n".format(
+        self.on_response(request, response)
+        sys.setprofile(None)
+        self.trace.write(self.write_with_indent, self.show_stack)
+        self.trace.clear()
+        return response
+
+    def show_response(self, request, response):
+        self.output("\n\n-- {} {} {}\n{}\n\n".format(
             request.method,
             request.path,
-            response.status_code
+            response.status_code,
+            response.content
         ))
-        self.trace.write(self.output, self.show_stack)
-        self.trace.clear()
-        sys.setprofile(None)
-        return response
+
+    def write_with_indent(self, msg):
+        self.output("    {}".format(msg))
