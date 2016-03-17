@@ -50,9 +50,11 @@ class IOLoggerMiddleware(object):
         return response
 
     def show_response(self, request, response):
-        self.output("\n\n-- {} {} {}\n{}\n\n".format(
+        qs = request.META['QUERY_STRING']
+        self.output("\n\n-- {} {}{} {}\n{}\n\n".format(
             request.method,
             request.path,
+            "?" + qs if qs else "",
             response.status_code,
             response.content
         ))

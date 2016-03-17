@@ -36,6 +36,8 @@ class RedisFilter(FilterBase):
 
     def write(self, node, puts):
         v = node.frame2.f_locals
+        if 'args' not in v:
+            return
         args = ' '.join([safe(x) for x in v['args']])
         ret = self.show(node.ret)
         puts('[redis] {} # {}'.format(args, ret))
@@ -48,5 +50,7 @@ class MysqlFilter(FilterBase):
 
     def write(self, node, puts):
         v = node.frame2.f_locals
+        if 'query' not in v:
+            return
         sql = self._sql_sub.sub('SELECT * FROM ', v['query'])
         puts('[mysql] {}'.format(sql))
